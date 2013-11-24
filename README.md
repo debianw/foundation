@@ -1,6 +1,6 @@
 # [Foundation](http://foundation.zurb.com)
 
-[![Build Status](https://travis-ci.org/debianw/is.png?branch=master)](https://travis-ci.org/debianw/foundation)
+[![Build Status](https://travis-ci.org/debianw/foundation.png?branch=master)](https://travis-ci.org/debianw/foundation)
 
 Foundation is the most advanced responsive front-end framework in the world. You can quickly prototype and build sites or apps that work on any kind of device with Foundation, which includes layout constructs (like a fully responsive grid), elements and best practices.
 
