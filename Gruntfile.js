@@ -1,3 +1,14 @@
+/**
+ * Module dependencies.
+ */
+
+var fs = require('fs')
+  , path = require('path');
+
+/**
+ * Expose.
+ */
+
 module.exports = function(grunt) {
   var hljs = require('highlight.js');
   hljs.LANGUAGES['scss'] = require('./lib/scss.js')(hljs);
@@ -206,8 +217,28 @@ module.exports = function(grunt) {
   grunt.task.renameTask('watch', 'watch_start');
   grunt.task.registerTask('watch', ['karma:dev_watch:start', 'watch_start']);
 
+  grunt.registerTask('componentize', 'Create a component.json', function () {
+    var component = {
+      name: "foundation",
+      version: grunt.config('pkg').version,
+      styles: [].concat(grunt.file.expand('dist/assets/css/**/*.css')),
+      scripts: [].concat(grunt.file.expand('dist/assets/js/**/*.js')),
+      files: [].concat(grunt.file.expand('scss/**/*.scss'))
+    };
+
+    var done = this.async();
+    
+    fs.writeFile(path.join(__dirname,'component.json'), JSON.stringify(component, null, 2), function (err) {
+      if (err) return console.log("ERROR");
+
+      grunt.log.ok('component.json created');
+
+      done();
+    });
+  });
+
   grunt.registerTask('compile:assets', ['clean', 'sass', 'concat', 'uglify', 'copy']);
-  grunt.registerTask('compile', ['compile:assets', 'assemble']);
+  grunt.registerTask('compile', ['compile:assets', 'assemble', 'componentize']);
   grunt.registerTask('build', ['compile', 'compress']);
   grunt.registerTask('default', ['compile', 'watch']);
   grunt.registerTask('travis', ['compile', 'karma:continuous']);

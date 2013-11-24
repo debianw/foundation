@@ -1,5 +1,6 @@
 /bower_components/*
 /dist/*
+!/dist/assets
 *.gem
 *.rbc
 .bundle
