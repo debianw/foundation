@@ -199,25 +199,7 @@ module.exports = function(grunt) {
           host: "deployer@foundation5.zurb.com"
         }
       }
-    },
-
-    /*exec: {
-      pushComponent: {
-        cmd: function () {
-          var commands = [
-            'git clone https://github.com/debianw/component-foundation.git && ',
-            'cp -r dist/assets/* component-foundation/ && ',
-            'cd component-foundation && ',
-            'git add . && ',
-            'git commit -m"Foundation build to component-foundation" && ',
-            'git push -fq origin master && ',
-            'rm -rfv component-foundation '
-          ].join("");
-
-          return commands;
-        }
-      }
-    }*/
+    }
 
   });
 
@@ -232,7 +214,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-rsync');
   grunt.loadNpmTasks('assemble');
   grunt.loadNpmTasks('grunt-newer');
-  //grunt.loadNpmTasks('grunt-exec');
 
   grunt.task.renameTask('watch', 'watch_start');
   grunt.task.registerTask('watch', ['karma:dev_watch:start', 'watch_start']);
@@ -259,7 +240,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('compile:assets', ['clean', 'sass', 'concat', 'uglify', 'copy']);
-  grunt.registerTask('compile', ['compile:assets', 'assemble', 'componentize', 'exec:pushComponent']);
+  grunt.registerTask('compile', ['compile:assets', 'assemble', 'componentize']);
   grunt.registerTask('build', ['compile', 'compress']);
   grunt.registerTask('default', ['compile', 'watch']);
   grunt.registerTask('travis', ['compile', 'karma:continuous']);
