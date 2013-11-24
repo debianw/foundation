@@ -103,7 +103,8 @@ module.exports = function(grunt) {
           {cwd: 'js/', expand:true, filter: 'isFile', src: ['{foundation,vendor}/**/*.js'], dest: 'dist/assets/js'},
           {cwd: 'js/vendor/', expand:true, filter: 'isFile', src: ['**/*.js'], dest: 'dist/docs/assets/js/'},
           {cwd: 'scss/', expand:true, filter: 'isFile', src: '**/*.scss', dest: 'dist/assets/scss/'},
-          {src: 'bower.json', dest: 'dist/assets/'}
+          {src: 'bower.json', dest: 'dist/assets/'},
+          {src: 'component.json', dest: 'dist/assets/'}
         ]
       }
     },
@@ -198,7 +199,25 @@ module.exports = function(grunt) {
           host: "deployer@foundation5.zurb.com"
         }
       }
-    }
+    },
+
+    /*exec: {
+      pushComponent: {
+        cmd: function () {
+          var commands = [
+            'git clone https://github.com/debianw/component-foundation.git && ',
+            'cp -r dist/assets/* component-foundation/ && ',
+            'cd component-foundation && ',
+            'git add . && ',
+            'git commit -m"Foundation build to component-foundation" && ',
+            'git push -fq origin master && ',
+            'rm -rfv component-foundation '
+          ].join("");
+
+          return commands;
+        }
+      }
+    }*/
 
   });
 
@@ -213,32 +232,34 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-rsync');
   grunt.loadNpmTasks('assemble');
   grunt.loadNpmTasks('grunt-newer');
+  //grunt.loadNpmTasks('grunt-exec');
 
   grunt.task.renameTask('watch', 'watch_start');
   grunt.task.registerTask('watch', ['karma:dev_watch:start', 'watch_start']);
 
   grunt.registerTask('componentize', 'Create a component.json', function () {
     var component = {
-      name: "foundation",
-      version: grunt.config('pkg').version,
-      styles: [].concat(grunt.file.expand('dist/assets/css/**/*.css')),
-      scripts: [].concat(grunt.file.expand('dist/assets/js/**/*.js')),
-      files: [].concat(grunt.file.expand('scss/**/*.scss'))
-    };
+          name: "foundation",
+          version: grunt.config('pkg').version,
+          styles: [].concat(grunt.file.expand('dist/assets/css/**/*.css')),
+          scripts: [].concat(grunt.file.expand('dist/assets/js/**/*.js')),
+          files: [].concat(grunt.file.expand('dist/assets/scss/**/*.scss'))
+        }
+      , done
+      , strjson
 
-    var done = this.async();
+    done = this.async();
+    strjson = JSON.stringify(component, null, 2).replace(/dist\/assets\//g, '');
     
-    fs.writeFile(path.join(__dirname,'component.json'), JSON.stringify(component, null, 2), function (err) {
+    fs.writeFile(path.join(__dirname,'component.json'), strjson , function (err) {
       if (err) return console.log("ERROR");
-
       grunt.log.ok('component.json created');
-
       done();
     });
   });
 
   grunt.registerTask('compile:assets', ['clean', 'sass', 'concat', 'uglify', 'copy']);
-  grunt.registerTask('compile', ['compile:assets', 'assemble', 'componentize']);
+  grunt.registerTask('compile', ['compile:assets', 'assemble', 'componentize', 'exec:pushComponent']);
   grunt.registerTask('build', ['compile', 'compress']);
   grunt.registerTask('default', ['compile', 'watch']);
   grunt.registerTask('travis', ['compile', 'karma:continuous']);
